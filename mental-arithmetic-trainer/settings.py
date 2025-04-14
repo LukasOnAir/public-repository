@@ -1,4 +1,4 @@
-#settings
+# settings.py
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
@@ -77,5 +77,6 @@ class SettingsFrame(ctk.CTkFrame):
             return
 
         self.pack_forget()
+        self.app.graph_frame.pack_forget()  # Hide the graph frame when the game starts
         self.app.game_frame = GameFrame(self.app.left_frame, self.app, settings)
         self.app.game_frame.pack(fill="both", expand=True)

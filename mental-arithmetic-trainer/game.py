@@ -1,4 +1,4 @@
-#game
+# game.py
 import customtkinter as ctk
 import random
 from tkinter import messagebox
@@ -19,6 +19,7 @@ class GameFrame(ctk.CTkFrame):
         self.answer_entry = ctk.CTkEntry(self, width=100)
         self.answer_entry.pack(pady=5)
         self.answer_entry.bind("<Return>", lambda event: self.check_answer())
+        self.answer_entry.bind("<KeyRelease>", self.check_answer_on_type)  # Bind KeyRelease event
 
         self.submit_button = ctk.CTkButton(self, text="Submit", command=self.check_answer)
         self.submit_button.pack(pady=5)
@@ -84,9 +85,23 @@ class GameFrame(ctk.CTkFrame):
             if user_answer == self.answer:
                 self.score += 1
                 self.score_label.configure(text=f"Score: {self.score}")
-            self.generate_problem()
+                self.generate_problem()
+            else:
+                self.answer_entry.delete(0, "end")  # Clear entry if answer is incorrect
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
+            self.answer_entry.delete(0, "end")
+
+    def check_answer_on_type(self, event):
+        """Check the answer as the user types and proceed if correct."""
+        try:
+            user_answer = int(self.answer_entry.get())
+            if user_answer == self.answer:
+                self.score += 1
+                self.score_label.configure(text=f"Score: {self.score}")
+                self.generate_problem()
+        except ValueError:
+            pass  # Ignore if input is not a valid integer yet
 
     def update_timer(self):
         """Update the countdown timer."""
@@ -101,6 +116,7 @@ class GameFrame(ctk.CTkFrame):
         """End the game and save results."""
         save_game_results(self.settings, self.score)
         self.pack_forget()
+        self.app.graph_frame.pack(side="right", fill="both", expand=True, padx=10)  # Show the graph frame
         self.app.settings_frame.pack(fill="both", expand=True)
         self.app.update_graph()
         messagebox.showinfo("Game Over", f"Your score: {self.score}")
